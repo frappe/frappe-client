@@ -9,7 +9,7 @@ Python Library for interacting with Frappe / ERPNext API
 	client = FrappeClient("example.com", "user@example.com", "password")
 
 	customer_name = client.get_value("Customer", {"email_id": "test@customer.com"})
-	customer = client.get("Customer", customer_name)
+	customer = client.get_doc("Customer", customer_name)
 
 
 ### Example

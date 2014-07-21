@@ -1,0 +1,8 @@
+*.pyc
+*.DS_STORE
+*.swp
+*.egg-info
+logply/config.py
+/dist
+_build/
+MANIFEST
