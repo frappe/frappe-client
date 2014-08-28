@@ -108,6 +108,16 @@ class FrappeClient(object):
 		}
 		return self.post_request(params)
 
+	def get_api(self, method, params={}):
+		res = self.session.get(self.url + "/api/method/" + method + "/",
+			params=params)
+		return self.post_process(res)
+
+	def post_api(self, method, params={}):
+		res = self.session.post(self.url + "/api/method/" + method + "/",
+			params=params)
+		return self.post_process(res)
+
 	def get_request(self, params):
 		res = self.session.get(self.url, params=self.preprocess(params))
 		res = self.post_process(res)
