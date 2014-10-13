@@ -4,12 +4,53 @@ Python Library for interacting with Frappe / ERPNext API
 
 ### Usage
 
-	from frappeclient import FrappeClient
+### Create a Customer, and then fetch it back from the HTTP API
+```python
+from frappeclient import FrappeClient
 
-	client = FrappeClient("example.com", "user@example.com", "password")
+client = FrappeClient("example.com", "user@example.com", "password")
 
-	customer_name = client.get_value("Customer", {"email_id": "test@customer.com"})
-	customer = client.get_doc("Customer", customer_name)
+# Prepare a customer dict that we will use to create a new
+# customer in ERPNext
+doc = {"doctype": "Customer",
+       "customer_name": "Example Inc.",
+       "customer_type": "Company",
+       "website": "example.com"}
+
+# create new record in ERPNext
+client.insert(doc)
+
+# Query the erpnext HTTP API for the name of customer whos
+# website is example.com
+customer_name = client.get_value("Customer",
+                                 "name",
+                                 {"website": "example.com"})
+# Fetch customer
+customer = client.get_doc("Customer", customer_name['name'])
+```
+
+#### Fetch a list of Items from the HTTP API
+```python
+from frappeclient import FrappeClient
+
+client = FrappeClient("example.com", "user@example.com", "password")
+notes = [{"doctype": "Note", "title": "Sing", "public": True},
+         {"doctype": "Note", "title": "a", "public": True},
+         {"doctype": "Note", "title": "Song", "public": True},
+         {"doctype": "Note", "title": "of", "public": True},
+         {"doctype": "Note", "title": "sixpence", "public": True}
+         ]
+
+for note in notes:
+    print(client.insert(note))
+
+# Query for Note using only filters, and fields arguments. Returns a list
+# of four dicts with the respective titles Sing, Song and sixpence.
+notes_starting_sith_S = client.get_doc(
+    'Note',
+    filters=[["Note", "title", "LIKE", "S%"]],
+    fields=["title", "public"])
+```
 
 
 ### Example
