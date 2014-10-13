@@ -15,16 +15,16 @@ client = FrappeClient("example.com", "user@example.com", "password")
 doc = {"doctype": "Customer",
        "customer_name": "Example Inc.",
        "customer_type": "Company",
-       "website": "example.com"}
+       "website": "example.net"}
 
 # create new record in ERPNext
 client.insert(doc)
 
 # Query the erpnext HTTP API for the name of customer whos
-# website is example.com
+# website is example.net
 customer_name = client.get_value("Customer",
                                  "name",
-                                 {"website": "example.com"})
+                                 {"website": "example.net"})
 # Fetch customer
 customer = client.get_doc("Customer", customer_name['name'])
 ```
