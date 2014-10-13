@@ -89,10 +89,12 @@ class FrappeClient(object):
 			"name": name
 		})
 
-	def get_doc(self, doctype, name=None, filters=None):
+	def get_doc(self, doctype, name="", filters=None, fields=None):
 		params = {}
 		if filters:
 			params["filters"] = json.dumps(filters)
+                if fields:
+                        params["fields"] = json.dumps(fields)
 
 		res = self.session.get(self.url + "/api/resource/" + doctype + "/" + name,
 			params=params)
