@@ -6,3 +6,4 @@ logply/config.py
 /dist
 _build/
 MANIFEST
+env/
