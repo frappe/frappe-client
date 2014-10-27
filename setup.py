@@ -15,6 +15,7 @@ setup(
     ],
     install_requires=install_requires,
     tests_requires=[
-        'httmock<=1.2.2'
+        'httmock<=1.2.2',
+        'nose<=1.3.4'
     ],
 )
