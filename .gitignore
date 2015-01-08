@@ -2,7 +2,9 @@
 *.DS_STORE
 *.swp
 *.egg-info
+*.ropeproject
 logply/config.py
 /dist
 _build/
 MANIFEST
+env/

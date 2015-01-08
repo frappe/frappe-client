@@ -1,14 +1,21 @@
-from distutils.core import setup
-import os
+from setuptools import setup
 
 version = '0.1.0dev'
 
+with open('requirements.txt') as requirements:
+    install_requires = requirements.read().split()
+
 setup(
-    name='FrappeClient',
+    name='frappeclient',
     version=version,
     author='Rushabh Mehta',
     author_email='rmehta@erpnext.com',
-    download_url='https://github.com/jevonearth/frappe-client/archive/'+version+'.tar.gz',
-    packages=['frappeclient',],
-    install_requires=open(os.path.join(os.path.dirname(__file__), 'requirements.txt')).read().split(),
+    packages=[
+        'frappeclient'
+    ],
+    install_requires=install_requires,
+    tests_requires=[
+        'httmock<=1.2.2',
+        'nose<=1.3.4'
+    ],
 )
