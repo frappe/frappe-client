@@ -46,7 +46,7 @@ for note in notes:
 
 # Query for Note using only filters, and fields arguments. Returns a list
 # of four dicts with the respective titles Sing, Song and sixpence.
-notes_starting_sith_S = client.get_doc(
+notes_starting_with_S = client.get_doc(
     'Note',
     filters=[["Note", "title", "LIKE", "S%"]],
     fields=["title", "public"])
