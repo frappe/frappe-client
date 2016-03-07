@@ -1,11 +1,18 @@
 import requests
 import json
+from StringIO import StringIO
 
 class AuthError(Exception):
 	pass
 
 class FrappeException(Exception):
 	pass
+
+class NotUploadableException(FrappeException):
+	def __init__(self, doctype):
+		self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(doctype)
+
+CAN_DOWNLOAD = []
 
 class FrappeClient(object):
 	def __init__(self, url, username, password):
@@ -20,6 +27,7 @@ class FrappeClient(object):
 		self.logout()
 
 	def login(self, username, password):
+		global CAN_DOWNLOAD
 		r = self.session.post(self.url, data={
 			'cmd': 'login',
 			'usr': username,
@@ -27,14 +35,17 @@ class FrappeClient(object):
 		})
 
 		if r.json().get('message') == "Logged In":
+			CAN_DOWNLOAD = []
 			return r.json()
 		else:
 			raise AuthError
 
 	def logout(self):
+		global CAN_DOWNLOAD
 		self.session.get(self.url, params={
 			'cmd': 'logout',
 		})
+		CAN_DOWNLOAD = []
 
 	def insert(self, doc):
 		res = self.session.post(self.url + "/api/resource/" + doc.get("doctype"),
@@ -110,6 +121,55 @@ class FrappeClient(object):
 		}
 		return self.post_request(params)
 
+	def get_pdf(self, doctype, name, print_format="Standard", letterhead=True):
+		params = {
+			'doctype': doctype,
+			'name': name,
+			'format': print_format,
+			'no_letterhead': int(not bool(letterhead))
+		}
+		response = self.session.get(
+			self.url + "/api/method/frappe.templates.pages.print.download_pdf",
+			params=params, stream=True)
+
+		return self.post_process_file_stream(response)
+
+	def get_html(self, doctype, name, print_format="Standard", letterhead=True):
+		params = {
+			'doctype': doctype,
+			'name': name,
+			'format': print_format,
+			'no_letterhead': int(not bool(letterhead))
+		}
+		response = self.session.get(
+			self.url + '/print', params=params, stream=True
+		)
+		return self.post_process_file_stream(response)
+
+	def __load_downloadable_templates(self):
+		global CAN_DOWNLOAD
+		CAN_DOWNLOAD = self.get_api('frappe.core.page.data_import_tool.data_import_tool.get_doctypes')
+
+	def get_upload_template(self, doctype, with_data=False):
+		global CAN_DOWNLOAD
+		if not CAN_DOWNLOAD:
+			self.__load_downloadable_templates()
+
+		if doctype not in CAN_DOWNLOAD:
+			raise NotUploadableException(doctype)
+
+		params = {
+			'doctype': doctype,
+			'parent_doctype': doctype,
+			'with_data': 'Yes' if with_data else 'No',
+			'all_doctypes': 'Yes'
+		}
+
+		request = self.session.get(self.url +
+			'/api/method/frappe.core.page.data_import_tool.exporter.get_template',
+			params=params)
+		return self.post_process_file_stream(request)
+
 	def get_api(self, method, params={}):
 		res = self.session.get(self.url + "/api/method/" + method + "/",
 			params=params)
@@ -153,3 +213,26 @@ class FrappeClient(object):
 			return rjson['data']
 		else:
 			return None
+
+	def post_process_file_stream(self, response):
+		if response.ok:
+			output = StringIO()
+			for block in response.iter_content(1024):
+				output.write(block)
+			return output
+
+		else:
+			try:
+				rjson = response.json()
+			except ValueError:
+				print response.text
+				raise
+
+			if rjson and ("exc" in rjson) and rjson["exc"]:
+				raise FrappeException(rjson["exc"])
+			if 'message' in rjson:
+				return rjson['message']
+			elif 'data' in rjson:
+				return rjson['data']
+			else:
+				return None
