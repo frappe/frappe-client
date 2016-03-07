@@ -100,7 +100,7 @@ def download():
 				with open(os.path.join(base_path, '.'.join([dt, ext])), 'wb') as handler:
 					fn = getattr(c, method)
 					if ext == 'pdf':
-						content = fn('DocType', dt, 'Table')
+						content = fn('DocType', dt, 'Standard')
 					else:
 						try:
 							content = fn(dt)
