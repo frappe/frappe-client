@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from frappeclient import FrappeClient
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
+
 import httpretty
 import unittest
 

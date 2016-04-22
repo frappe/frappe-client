@@ -1,6 +1,23 @@
-import requests
+import sys
 import json
-from StringIO import StringIO
+import requests
+
+# thin compatibility support for python3
+if sys.version_info[0] < 3: # py2
+    from StringIO import StringIO
+    #python 2
+    def itervalues(d):
+        return d.itervalues()
+    def iteritems(d):
+        return d.iteritems()
+
+else: # py3
+    from io import StringIO
+    #python 3
+    def itervalues(d):
+        return iter(d.values())
+    def iteritems(d):
+        return iter(d.items())
 
 class AuthError(Exception):
 	pass
@@ -104,8 +121,8 @@ class FrappeClient(object):
 		params = {}
 		if filters:
 			params["filters"] = json.dumps(filters)
-                if fields:
-                        params["fields"] = json.dumps(fields)
+		if fields:
+			params["fields"] = json.dumps(fields)
 
 		res = self.session.get(self.url + "/api/resource/" + doctype + "/" + name,
 			params=params)
@@ -192,7 +209,7 @@ class FrappeClient(object):
 
 	def preprocess(self, params):
 		"""convert dicts, lists to json"""
-		for key, value in params.iteritems():
+		for key, value in iteritems(params):
 			if isinstance(value, (dict, list)):
 				params[key] = json.dumps(value)
 
@@ -202,7 +219,7 @@ class FrappeClient(object):
 		try:
 			rjson = response.json()
 		except ValueError:
-			print response.text
+			print(response.text)
 			raise
 
 		if rjson and ("exc" in rjson) and rjson["exc"]:
@@ -225,7 +242,7 @@ class FrappeClient(object):
 			try:
 				rjson = response.json()
 			except ValueError:
-				print response.text
+				print(response.text)
 				raise
 
 			if rjson and ("exc" in rjson) and rjson["exc"]:
