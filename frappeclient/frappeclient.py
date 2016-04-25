@@ -117,8 +117,7 @@ class FrappeClient(object):
 			"name": name
 		})
 
-	def get_doc(self, doctype, name="", filters=None, fields=None):
-		params = {}
+	def get_doc(self, doctype, name="", filters=None, fields=None, params={}):
 		if filters:
 			params["filters"] = json.dumps(filters)
 		if fields:
