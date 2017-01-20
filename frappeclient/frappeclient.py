@@ -15,10 +15,11 @@ class NotUploadableException(FrappeException):
 CAN_DOWNLOAD = []
 
 class FrappeClient(object):
-	def __init__(self, url, username, password):
+	def __init__(self, url, username, password, proxies=None):
 		self.session = requests.Session()
 		self.url = url
 		self.login(username, password)
+		self.proxies = proxies if proxies else {}
 
 	def __enter__(self):
 		return self
@@ -181,12 +182,12 @@ class FrappeClient(object):
 		return self.post_process(res)
 
 	def get_request(self, params):
-		res = self.session.get(self.url, params=self.preprocess(params))
+		res = self.session.get(self.url, params=self.preprocess(params), proxies=self.proxies)
 		res = self.post_process(res)
 		return res
 
 	def post_request(self, data):
-		res = self.session.post(self.url, data=self.preprocess(data))
+		res = self.session.post(self.url, data=self.preprocess(data), proxies=self.proxies)
 		res = self.post_process(res)
 		return res
 
