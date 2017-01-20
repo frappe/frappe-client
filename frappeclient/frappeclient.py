@@ -17,29 +17,30 @@ class NotUploadableException(FrappeException):
         self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(
             doctype)
 
+
 CAN_DOWNLOAD = []
 
 
 class FrappeClient(object):
 
     def __init__(self, url, username, password, timeout=None, proxies=None, pool=None):
-		'''
-		Additions:
-		
-		Added timeout, proxies and pool support in the function.
-		- `timeout` is the time (seconds) for which the API client will wait for
-		a request to complete before it fails. Default None. This should be set to a float for 
-		production machines. 
-		- `proxies` to set requests proxy.
-		Check [python requests documentation](http://docs.python-requests.org/en/master/user/advanced/#proxies) for usage and examples.
-		- `pool` is manages request pools. It takes a dict of params accepted by HTTPAdapter as described here http://docs.python-requests.org/en/master/api/
-		
-		'''
+        '''
+        Additions:
+
+        Added timeout, proxies and pool support in the function.
+        - `timeout` is the time (seconds) for which the API client will wait for
+        a request to complete before it fails. Default None. This should be set to a float for
+        production machines.
+        - `proxies` to set requests proxy.
+        Check [python requests documentation](http://docs.python-requests.org/en/master/user/advanced/#proxies) for usage and examples.
+        - `pool` is manages request pools. It takes a dict of params accepted by HTTPAdapter as described here http://docs.python-requests.org/en/master/api/
+
+        '''
         self.session = requests.Session()
         self.url = url
         self.login(username, password)
         self.proxies = proxies if proxies else {}
-		self.timeout = timeout
+        self.timeout = timeout
 
         if pool:
             requests.packages.urllib3.disable_warnings()
@@ -59,7 +60,7 @@ class FrappeClient(object):
             'usr': username,
             'pwd': password
         },
-			timeout=self.timeout,
+            timeout=self.timeout,
             proxies=self.proxies)
 
         if r.json().get('message') == "Logged In":
@@ -74,7 +75,7 @@ class FrappeClient(object):
             self.url, params={
                 'cmd': 'logout',
             },
-			timeout=self.timeout,
+            timeout=self.timeout,
             proxies=self.proxies)
         CAN_DOWNLOAD = []
 
@@ -86,7 +87,8 @@ class FrappeClient(object):
     def update(self, doc):
         url = self.url + "/api/resource/" + \
             doc.get("doctype") + "/" + doc.get("name")
-        res = self.session.put(url, data={"data": json.dumps(doc)}, timeout=self.timeout, proxies=self.proxies)
+        res = self.session.put(url, data={"data": json.dumps(
+            doc)}, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def bulk_update(self, docs):
