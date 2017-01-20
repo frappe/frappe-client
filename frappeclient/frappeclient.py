@@ -22,11 +22,12 @@ CAN_DOWNLOAD = []
 
 class FrappeClient(object):
 
-    def __init__(self, url, username, password, proxies=None, pool=None):
+    def __init__(self, url, username, password, timeout=None, proxies=None, pool=None):
         self.session = requests.Session()
         self.url = url
         self.login(username, password)
         self.proxies = proxies if proxies else {}
+		self.timeout = timeout
 
         if pool:
             requests.packages.urllib3.disable_warnings()
@@ -46,6 +47,7 @@ class FrappeClient(object):
             'usr': username,
             'pwd': password
         },
+			timeout=self.timeout,
             proxies=self.proxies)
 
         if r.json().get('message') == "Logged In":
@@ -60,18 +62,19 @@ class FrappeClient(object):
             self.url, params={
                 'cmd': 'logout',
             },
+			timeout=self.timeout,
             proxies=self.proxies)
         CAN_DOWNLOAD = []
 
     def insert(self, doc):
         res = self.session.post(self.url + "/api/resource/" + doc.get("doctype"),
-                                data={"data": json.dumps(doc)}, proxies=self.proxies)
+                                data={"data": json.dumps(doc)}, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def update(self, doc):
         url = self.url + "/api/resource/" + \
             doc.get("doctype") + "/" + doc.get("name")
-        res = self.session.put(url, data={"data": json.dumps(doc)})
+        res = self.session.put(url, data={"data": json.dumps(doc)}, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def bulk_update(self, docs):
@@ -125,7 +128,7 @@ class FrappeClient(object):
             params["fields"] = json.dumps(fields)
 
         res = self.session.get(self.url + "/api/resource/" + doctype + "/" + name,
-                               params=params, proxies=self.proxies)
+                               params=params, timeout=self.timeout, proxies=self.proxies)
 
         return self.post_process(res)
 
@@ -147,7 +150,7 @@ class FrappeClient(object):
         }
         response = self.session.get(
             self.url + "/api/method/frappe.templates.pages.print.download_pdf",
-            params=params, stream=True, proxies=self.proxies)
+            params=params, stream=True, timeout=self.timeout, proxies=self.proxies)
 
         return self.post_process_file_stream(response)
 
@@ -159,7 +162,7 @@ class FrappeClient(object):
             'no_letterhead': int(not bool(letterhead))
         }
         response = self.session.get(
-            self.url + '/print', params=params, stream=True, proxies=self.proxies
+            self.url + '/print', params=params, stream=True, timeout=self.timeout, proxies=self.proxies
         )
         return self.post_process_file_stream(response)
 
@@ -185,28 +188,28 @@ class FrappeClient(object):
 
         request = self.session.get(self.url +
                                    '/api/method/frappe.core.page.data_import_tool.exporter.get_template',
-                                   params=params, proxies=self.proxies)
+                                   params=params, timeout=self.timeout, proxies=self.proxies)
         return self.post_process_file_stream(request)
 
     def get_api(self, method, params={}):
         res = self.session.get(self.url + "/api/method/" + method + "/",
-                               params=params, proxies=self.proxies)
+                               params=params, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def post_api(self, method, params={}):
         res = self.session.post(self.url + "/api/method/" + method + "/",
-                                params=params, proxies=self.proxies)
+                                params=params, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def get_request(self, params):
         res = self.session.get(self.url, params=self.preprocess(
-            params), proxies=self.proxies)
+            params), timeout=self.timeout, proxies=self.proxies)
         res = self.post_process(res)
         return res
 
     def post_request(self, data):
         res = self.session.post(
-            self.url, data=self.preprocess(data), proxies=self.proxies)
+            self.url, data=self.preprocess(data), timeout=self.timeout, proxies=self.proxies)
         res = self.post_process(res)
         return res
 
