@@ -207,8 +207,9 @@ class FrappeClient(object):
 
     def get_api(self, method, params=None):
 		params = params if params else {}
-        res = self.session.get(self.url + "/api/method/" + method + "/",
-                               params=params, timeout=self.timeout, proxies=self.proxies)
+        res = self.session.get(
+			self.url + "/api/method/" + method + "/",
+			params=params, timeout=self.timeout, proxies=self.proxies)
         return self.post_process(res)
 
     def post_api(self, method, params=None):
