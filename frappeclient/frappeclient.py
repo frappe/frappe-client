@@ -38,9 +38,9 @@ class FrappeClient(object):
         '''
         self.session = requests.Session()
         self.url = url
-        self.login(username, password)
         self.proxies = proxies if proxies else {}
         self.timeout = timeout
+        self.login(username, password)
 
         if pool:
             requests.packages.urllib3.disable_warnings()
