@@ -8,5 +8,3 @@ logply/config.py
 _build/
 MANIFEST
 env/
-.idea/
-tags
