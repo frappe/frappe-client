@@ -134,12 +134,16 @@ class FrappeClient(object):
             "name": name
         })
 
-    def get_doc(self, doctype, name="", filters=None, fields=None):
+    def get_doc(self, doctype, name="", filters=None, fields=None, limit_page_length=None, limit_start=None):
         params = {}
         if filters:
             params["filters"] = json.dumps(filters)
         if fields:
             params["fields"] = json.dumps(fields)
+        if limit_start:
+            params["limit_start"] = json.dumps(limit_start)
+        if limit_page_length:
+            params["limit_page_length"] = json.dumps(limit_page_length)
 
         res = self.session.get(self.url + "/api/resource/" + doctype + "/" + name,
                                params=params, timeout=self.timeout, proxies=self.proxies)
