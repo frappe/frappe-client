@@ -129,7 +129,7 @@ class FrappeClient(object):
 			'no_letterhead': int(not bool(letterhead))
 		}
 		response = self.session.get(
-			self.url + "/api/method/frappe.templates.pages.print.download_pdf",
+			self.url + "/api/method/frappe.utils.print_format.download_pdf"
 			params=params, stream=True)
 
 		return self.post_process_file_stream(response)
