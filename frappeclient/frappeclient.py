@@ -75,6 +75,21 @@ class FrappeClient(object):
 			"cmd": "frappe.client.submit",
 			"doclist": json.dumps(doclist)
 		})
+	
+	def insert_comment(self, doc):
+		return self.post_request({
+			"cmd": "frappe.desk.form.utils.add_comment",
+			"doc": json.dumps(doc)
+		})
+
+	def assign_to(self, assign_to, doctype, name, description):
+		return self.post_request({
+			"cmd": "frappe.desk.form.assign_to.add",
+			"assign_to": assign_to,
+			"doctype": doctype,
+			"name": name,
+			"description": description
+		})
 
 	def get_value(self, doctype, fieldname=None, filters=None):
 		return self.get_request({
