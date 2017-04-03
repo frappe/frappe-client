@@ -84,6 +84,15 @@ class FrappeClient(object):
 			"filters": json.dumps(filters)
 		})
 
+	def get_list(self, doctype, fieldname=None, filters=None, limit=None):
+		return self.get_request({
+			"cmd": "frappe.client.get_list",
+			"doctype": doctype,
+			"fieldname": fieldname or "name",
+			"filters": json.dumps(filters),
+			"limit_page_length": limit or 20,
+		})
+
 	def set_value(self, doctype, docname, fieldname, value):
 		return self.post_request({
 			"cmd": "frappe.client.set_value",
