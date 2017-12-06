@@ -118,7 +118,6 @@ class FrappeClient(object):
             "cmd": "frappe.client.get_list",
             "doctype": doctype,
             "filters": filters,
-            #"order_by": order_by,
             "limit_start": limit_start,
             "limit_page_length": limit_page_length
         }
