@@ -1,6 +1,6 @@
 import requests
 import json
-from StringIO import StringIO
+from io import StringIO
 
 class AuthError(Exception):
 	pass
@@ -104,8 +104,8 @@ class FrappeClient(object):
 		params = {}
 		if filters:
 			params["filters"] = json.dumps(filters)
-                if fields:
-                        params["fields"] = json.dumps(fields)
+			if fields:
+				params["fields"] = json.dumps(fields)
 
 		res = self.session.get(self.url + "/api/resource/" + doctype + "/" + name,
 			params=params)
@@ -202,7 +202,7 @@ class FrappeClient(object):
 		try:
 			rjson = response.json()
 		except ValueError:
-			print response.text
+			print(response.text)
 			raise
 
 		if rjson and ("exc" in rjson) and rjson["exc"]:
@@ -225,7 +225,7 @@ class FrappeClient(object):
 			try:
 				rjson = response.json()
 			except ValueError:
-				print response.text
+				print(response.text)
 				raise
 
 			if rjson and ("exc" in rjson) and rjson["exc"]:
