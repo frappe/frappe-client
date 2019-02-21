@@ -8,7 +8,8 @@ Python Library for interacting with Frappe / ERPNext API
 ```python
 from frappeclient import FrappeClient
 
-client = FrappeClient("example.com", "user@example.com", "password")
+client = FrappeClient("https://example.com")
+client.login("user@example.com", "password")
 
 # Prepare a customer dict that we will use to create a new
 # customer in ERPNext
@@ -33,7 +34,8 @@ customer = client.get_doc("Customer", customer_name['name'])
 ```python
 from frappeclient import FrappeClient
 
-client = FrappeClient("example.com", "user@example.com", "password")
+client = FrappeClient("https://example.com")
+client.login("user@example.com", "password")
 notes = [{"doctype": "Note", "title": "Sing", "public": True},
          {"doctype": "Note", "title": "a", "public": True},
          {"doctype": "Note", "title": "Song", "public": True},
@@ -52,6 +54,15 @@ notes_starting_with_S = client.get_doc(
     fields=["title", "public"])
 ```
 
+#### Use token based authentication
+```python
+from frappeclient import FrappeClient
+
+client = FrappeClient("https://example.com")
+client.authenticate("my_api_key", "my_api_secret")
+```
+
+For demonstration purposes only! Never store any credentials in your source code. Instead, you could set them as environment variables and fetch them with `os.getenv()`.
 
 ### Example
 
