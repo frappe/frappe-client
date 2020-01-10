@@ -5,6 +5,7 @@ Python Library for interacting with Frappe / ERPNext API
 ### Usage
 
 ### Create a Customer, and then fetch it back from the HTTP API
+
 ```python
 from frappeclient import FrappeClient
 
