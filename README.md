@@ -27,8 +27,12 @@ conn = FrappeClient("example.com", "user@example.com", "password")
 Get a list of documents from the server
 
 Arguments:
-	- `fields`: List of fields to fetch
-	- `filters`: Dict of filters
+- `doctype`
+- `fields`: List of fields to fetch
+- `filters`: Dict of filters
+- `limit_start`: Start at row ID (default 0)
+- `limit_page_length`: Page length
+- `order_by`: sort key and order (default is `modified desc`)
 
 ```py
 users = conn.get_list('User', fields = ['name', 'first_name', 'last_name'], , filters = {'user_type':'System User'})
@@ -44,7 +48,8 @@ Example of filters:
 Insert a new document to the server
 
 Arguments:
-	- `doc`: Document object
+
+- `doc`: Document object
 
 ```python
 doc = conn.insert({
@@ -55,25 +60,55 @@ doc = conn.insert({
 })
 ```
 
-### get_doc
+#### get_doc
 
 Fetch a document from the server
+
+Arguments
+- `doctype`
+- `name`
 
 ```py
 doc = conn.get_doc('Customer', 'Example Co')
 ```
 
-### get_value
+#### get_value
 
 Fetch a single value from the server
 
 Arguments:
-	- `doctype`
-	- `fieldname`
-	- `filters`
+
+- `doctype`
+- `fieldname`
+- `filters`
 
 ```py
-customer_name = client.get_value("Customer", "name", {"website": "example.net"})
+customer_name = conn.get_value("Customer", "name", {"website": "example.net"})
+```
+
+#### update
+
+Update a document (if permitted)
+
+Arguments:
+- `doc`: JSON document object
+
+```py
+doc = conn.get_doc('Customer', 'Example Co')
+doc.phone = '000000000'
+conn.update(doc)
+```
+
+#### delete
+
+Delete a document (if permitted)
+
+Arguments:
+- `doctype`
+- `name`
+
+```py
+conn.delete('Customer', 'Example Co')
 ```
 
 ### Example
@@ -93,7 +128,8 @@ notes = [
 for note in notes:
 	print(conn.insert(note))
 
-notes_starting_with_s = conn.get_doc(
+# get note starting with s
+notes = conn.get_doc(
 	'Note',
 	filters={'title': ('like', 's') },
 	fields=["title", "public"])
