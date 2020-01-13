@@ -22,8 +22,7 @@ class FrappeException(Exception):
 
 class NotUploadableException(FrappeException):
 	def __init__(self, doctype):
-		self.message = 'The doctype `{1}` is not uploadable, so you can\'t download the template'.format(
-			doctype)
+		self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(doctype)
 
 
 class FrappeClient(object):
@@ -70,7 +69,7 @@ class FrappeClient(object):
 		})
 
 	def get_list(self, doctype, fields='"*"', filters=None, limit_start=0, limit_page_length=0, order_by=None):
-		"""Returns list of records of a particular type"""
+		'''Returns list of records of a particular type'''
 		if not isinstance(fields, unicode):
 			fields = json.dumps(fields)
 		params = {
@@ -240,19 +239,18 @@ class FrappeClient(object):
 			'all_doctypes': 'Yes'
 		}
 
-		request = self.session.get(self.url +
-								   '/api/method/frappe.core.page.data_import_tool.exporter.get_template',
-								   params=params)
+		request = self.session.get(
+			self.url + '/api/method/frappe.core.page.data_import_tool.exporter.get_template',
+			params=params
+		)
 		return self.post_process_file_stream(request)
 
 	def get_api(self, method, params={}):
-		res = self.session.get(self.url + '/api/method/' + method + '/',
-							   params=params)
+		res = self.session.get(self.url + '/api/method/' + method + '/', params=params)
 		return self.post_process(res)
 
 	def post_api(self, method, params={}):
-		res = self.session.post(self.url + '/api/method/' + method + '/',
-								params=params)
+		res = self.session.post(self.url + '/api/method/' + method + '/', params=params)
 		return self.post_process(res)
 
 	def get_request(self, params):
