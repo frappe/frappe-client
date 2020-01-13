@@ -1,10 +1,16 @@
 import requests
 import json
+
+
 try:
 	from StringIO import StringIO
 except:
 	from IO import StringIO
 
+try:
+    unicode
+except NameError:
+    unicode = str
 
 class AuthError(Exception):
 	pass
@@ -16,11 +22,12 @@ class NotUploadableException(FrappeException):
 	def __init__(self, doctype):
 		self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(doctype)
 
-CAN_DOWNLOAD = []
-
 class FrappeClient(object):
-	def __init__(self, url, username, password):
+	def __init__(self, url=None, username=None, password=None, verify=True):
+		self.headers = dict(Accept='application/json')
 		self.session = requests.Session()
+		self.can_download = []
+		self.verify = verify
 		self.url = url
 		self.login(username, password)
 
@@ -31,43 +38,78 @@ class FrappeClient(object):
 		self.logout()
 
 	def login(self, username, password):
-		global CAN_DOWNLOAD
 		r = self.session.post(self.url, data={
 			'cmd': 'login',
 			'usr': username,
 			'pwd': password
-		})
+		}, verify=self.verify, headers=self.headers)
 
 		if r.json().get('message') == "Logged In":
-			CAN_DOWNLOAD = []
+			self.can_download = []
 			return r.json()
 		else:
 			raise AuthError
 
 	def logout(self):
-		global CAN_DOWNLOAD
 		self.session.get(self.url, params={
 			'cmd': 'logout',
 		})
-		CAN_DOWNLOAD = []
+
+	def get_list(self, doctype, fields='"*"', filters=None, limit_start=0, limit_page_length=0):
+		"""Returns list of records of a particular type"""
+		if not isinstance(fields, unicode):
+			fields = json.dumps(fields)
+		params = {
+			"fields": fields,
+		}
+		if filters:
+			params["filters"] = json.dumps(filters)
+		if limit_page_length:
+			params["limit_start"] = limit_start
+			params["limit_page_length"] = limit_page_length
+
+		res = self.session.get(self.url + "/api/resource/" + doctype, params=params, verify=self.verify, headers=self.headers)
+		return self.post_process(res)
 
 	def insert(self, doc):
+		'''Insert a document to the remote server
+
+		:param doc: A dict or Document object to be inserted remotely'''
 		res = self.session.post(self.url + "/api/resource/" + doc.get("doctype"),
 			data={"data":json.dumps(doc)})
 		return self.post_process(res)
 
+	def insert_many(self, docs):
+		'''Insert multiple documents to the remote server
+
+		:param docs: List of dict or Document objects to be inserted in one request'''
+		return self.post_request({
+			"cmd": "frappe.client.insert_many",
+			"docs": frappe.as_json(docs)
+		})
+
 	def update(self, doc):
+		'''Update a remote document
+
+		:param doc: dict or Document object to be updated remotely. `name` is mandatory for this'''
 		url = self.url + "/api/resource/" + doc.get("doctype") + "/" + doc.get("name")
 		res = self.session.put(url, data={"data":json.dumps(doc)})
 		return self.post_process(res)
 
 	def bulk_update(self, docs):
+		'''Bulk update documents remotely
+
+		:param docs: List of dict or Document objects to be updated remotely (by `name`)'''
 		return self.post_request({
 			"cmd": "frappe.client.bulk_update",
 			"docs": json.dumps(docs)
 		})
 
 	def delete(self, doctype, name):
+		'''Delete remote document by name
+
+		:param doctype: `doctype` to be deleted
+		:param name: `name` of document to be deleted'''
 		return self.post_request({
 			"cmd": "frappe.client.delete",
 			"doctype": doctype,
@@ -75,6 +117,9 @@ class FrappeClient(object):
 		})
 
 	def submit(self, doclist):
+		'''Submit remote document
+
+		:param doc: dict or Document object to be submitted remotely'''
 		return self.post_request({
 			"cmd": "frappe.client.submit",
 			"doclist": json.dumps(doclist)
@@ -105,6 +150,12 @@ class FrappeClient(object):
 		})
 
 	def get_doc(self, doctype, name="", filters=None, fields=None):
+		'''Returns a single remote document
+
+		:param doctype: DocType of the document to be returned
+		:param name: (optional) `name` of the document to be returned
+		:param filters: (optional) Filter by this dict if name is not set
+		:param fields: (optional) Fields to be returned, will return everythign if not set'''
 		params = {}
 		if filters:
 			params["filters"] = json.dumps(filters)
@@ -117,6 +168,11 @@ class FrappeClient(object):
 		return self.post_process(res)
 
 	def rename_doc(self, doctype, old_name, new_name):
+		'''Rename remote document
+
+		:param doctype: DocType of the document to be renamed
+		:param old_name: Current `name` of the document to be renamed
+		:param new_name: New `name` to be set'''
 		params = {
 			"cmd": "frappe.client.rename_doc",
 			"doctype": doctype,
@@ -151,15 +207,13 @@ class FrappeClient(object):
 		return self.post_process_file_stream(response)
 
 	def __load_downloadable_templates(self):
-		global CAN_DOWNLOAD
-		CAN_DOWNLOAD = self.get_api('frappe.core.page.data_import_tool.data_import_tool.get_doctypes')
+		self.can_download = self.get_api('frappe.core.page.data_import_tool.data_import_tool.get_doctypes')
 
 	def get_upload_template(self, doctype, with_data=False):
-		global CAN_DOWNLOAD
-		if not CAN_DOWNLOAD:
+		if not self.can_download:
 			self.__load_downloadable_templates()
 
-		if doctype not in CAN_DOWNLOAD:
+		if doctype not in self.can_download:
 			raise NotUploadableException(doctype)
 
 		params = {
