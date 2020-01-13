@@ -95,7 +95,7 @@ Arguments:
 
 ```py
 doc = conn.get_doc('Customer', 'Example Co')
-doc.phone = '000000000'
+doc['phone'] = '000000000'
 conn.update(doc)
 ```
 
@@ -117,22 +117,22 @@ conn.delete('Customer', 'Example Co')
 from frappeclient import FrappeClient
 
 conn = FrappeClient("example.com", "user@example.com", "password")
-notes = [
-		{"doctype": "Note", "title": "Sing", "public": True},
-		{"doctype": "Note", "title": "a", "public": True},
-		{"doctype": "Note", "title": "Song", "public": True},
-		{"doctype": "Note", "title": "of", "public": True},
-		{"doctype": "Note", "title": "sixpence", "public": True}
-	]
+new_notes = [
+	{"doctype": "Note", "title": "Sing", "public": True},
+	{"doctype": "Note", "title": "a", "public": True},
+	{"doctype": "Note", "title": "Song", "public": True},
+	{"doctype": "Note", "title": "of", "public": True},
+	{"doctype": "Note", "title": "sixpence", "public": True}
+]
 
-for note in notes:
+for note in new_notes:
 	print(conn.insert(note))
 
 # get note starting with s
-notes = conn.get_doc(
-	'Note',
-	filters={'title': ('like', 's') },
-	fields=["title", "public"])
+notes = conn.get_list('Note',
+	filters={'title': ('like', 's')},
+	fields=["title", "public"]
+)
 ```
 
 ### Example
