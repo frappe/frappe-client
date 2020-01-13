@@ -1,61 +1,32 @@
 ## Frappe Client
 
-Python Library for interacting with Frappe / ERPNext API
+Simple Frappe-like Python wrapper for Frappe REST API
 
-### Usage
+### Install
 
-### Create a Customer, and then fetch it back from the HTTP API
-```python
-from frappeclient import FrappeClient
-
-client = FrappeClient("https://example.com")
-client.login("user@example.com", "password")
-
-# Prepare a customer dict that we will use to create a new
-# customer in ERPNext
-doc = {"doctype": "Customer",
-       "customer_name": "Example Inc.",
-       "customer_type": "Company",
-       "website": "example.net"}
-
-# create new record in ERPNext
-client.insert(doc)
-
-# Query the erpnext HTTP API for the name of customer whos
-# website is example.net
-customer_name = client.get_value("Customer",
-                                 "name",
-                                 {"website": "example.net"})
-# Fetch customer
-customer = client.get_doc("Customer", customer_name['name'])
+```
+git clone https://github.com/frappe/frappe-client
+pip install -e frappe-client
 ```
 
-#### Fetch a list of Items from the HTTP API
-```python
+### API
+
+FrappeClient has a frappe like API
+
+#### Login
+
+Login to the Frappe HTTP Server by creating a new FrappeClient object
+
+```py
 from frappeclient import FrappeClient
 
-client = FrappeClient("https://example.com")
-client.login("user@example.com", "password")
-notes = [{"doctype": "Note", "title": "Sing", "public": True},
-         {"doctype": "Note", "title": "a", "public": True},
-         {"doctype": "Note", "title": "Song", "public": True},
-         {"doctype": "Note", "title": "of", "public": True},
-         {"doctype": "Note", "title": "sixpence", "public": True}
-         ]
-
-for note in notes:
-    print(client.insert(note))
-
-# Query for Note using only filters, and fields arguments. Returns a list
-# of four dicts with the respective titles Sing, Song and sixpence.
-notes_starting_with_S = client.get_doc(
-    'Note',
-    filters=[["Note", "title", "LIKE", "S%"]],
-    fields=["title", "public"])
+conn = FrappeClient("example.com")
+conn.login("user@example.com", "password")
 ```
 
 #### Use token based authentication
-```python
+
+```py
 from frappeclient import FrappeClient
 
 client = FrappeClient("https://example.com")
@@ -63,6 +34,119 @@ client.authenticate("my_api_key", "my_api_secret")
 ```
 
 For demonstration purposes only! Never store any credentials in your source code. Instead, you could set them as environment variables and fetch them with `os.getenv()`.
+
+#### get_list
+
+Get a list of documents from the server
+
+Arguments:
+- `doctype`
+- `fields`: List of fields to fetch
+- `filters`: Dict of filters
+- `limit_start`: Start at row ID (default 0)
+- `limit_page_length`: Page length
+- `order_by`: sort key and order (default is `modified desc`)
+
+```py
+users = conn.get_list('User', fields = ['name', 'first_name', 'last_name'], , filters = {'user_type':'System User'})
+```
+
+Example of filters:
+- `{ "user_type": ("!=", "System User") }`
+- `{ "creation": (">", "2020-01-01") }`
+- `{ "name": "test@example.com" }`
+
+#### insert
+
+Insert a new document to the server
+
+Arguments:
+
+- `doc`: Document object
+
+```python
+doc = conn.insert({
+	"doctype": "Customer",
+	"customer_name": "Example Co",
+	"customer_type": "Company",
+	"website": "example.net"
+})
+```
+
+#### get_doc
+
+Fetch a document from the server
+
+Arguments
+- `doctype`
+- `name`
+
+```py
+doc = conn.get_doc('Customer', 'Example Co')
+```
+
+#### get_value
+
+Fetch a single value from the server
+
+Arguments:
+
+- `doctype`
+- `fieldname`
+- `filters`
+
+```py
+customer_name = conn.get_value("Customer", "name", {"website": "example.net"})
+```
+
+#### update
+
+Update a document (if permitted)
+
+Arguments:
+- `doc`: JSON document object
+
+```py
+doc = conn.get_doc('Customer', 'Example Co')
+doc['phone'] = '000000000'
+conn.update(doc)
+```
+
+#### delete
+
+Delete a document (if permitted)
+
+Arguments:
+- `doctype`
+- `name`
+
+```py
+conn.delete('Customer', 'Example Co')
+```
+
+### Example
+
+```python
+from frappeclient import FrappeClient
+
+conn = FrappeClient("example.com", "user@example.com", "password")
+new_notes = [
+	{"doctype": "Note", "title": "Sing", "public": True},
+	{"doctype": "Note", "title": "a", "public": True},
+	{"doctype": "Note", "title": "Song", "public": True},
+	{"doctype": "Note", "title": "of", "public": True},
+	{"doctype": "Note", "title": "sixpence", "public": True}
+]
+
+for note in new_notes:
+	print(conn.insert(note))
+
+# get note starting with s
+notes = conn.get_list('Note',
+	filters={'title': ('like', 's')},
+	fields=["title", "public"]
+)
+```
 
 ### Example
 

@@ -9,7 +9,7 @@ setup(
     name='frappeclient',
     version=version,
     author='Rushabh Mehta',
-    author_email='rmehta@erpnext.com',
+    author_email='rushabh@erpnext.com',
     packages=[
         'frappeclient'
     ],
