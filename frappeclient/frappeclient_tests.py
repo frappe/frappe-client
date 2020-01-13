@@ -35,11 +35,10 @@ class TestFrappeClient(unittest.TestCase):
 		self.conn.delete(doctype='Note', name=doc2.get('name'))
 		self.conn.delete(doctype='Note', name=doc3.get('name'))
 
-    def test_token_auth(self):
-        self.frappe = FrappeClient('https://example.com')
-        self.frappe.authenticate('test_key', 'test_secret')
-        auth_header = self.frappe.session.headers.get('Authorization')
-        self.assertEquals(auth_header, 'Basic dGVzdF9rZXk6dGVzdF9zZWNyZXQ=')
+	def test_token_auth(self):
+		self.conn.authenticate('test_key', 'test_secret')
+		auth_header = self.conn.session.headers.get('Authorization')
+		self.assertEquals(auth_header, 'Basic dGVzdF9rZXk6dGVzdF9zZWNyZXQ=')
 
 
 if __name__=='__main__':
