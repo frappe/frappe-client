@@ -1,42 +1,40 @@
 # -*- coding: utf-8 -*-
-from frappeclient import FrappeClient
-import urlparse
-import httpretty
 import unittest
+from frappeclient import FrappeClient
+
+test_config = dict(
+	url = 'http://frappe.local:8000',
+	username = 'Administrator',
+	password = 'admin'
+)
+
+TXT = 'test content'
+
+class TestFrappeClient(unittest.TestCase):
+	@classmethod
+	def setUpClass(cls):
+		cls.conn = FrappeClient(**test_config)
+
+	def test_insert(self):
+		doc = self.conn.insert(dict(doctype='Note', title='test note 1', content=TXT))
+		self.assertEqual(self.conn.get_value('Note', 'content',
+			dict(title='test note 1'))['content'], TXT)
+
+		self.conn.delete(doctype='Note', name=doc.get('name'))
+
+	def test_list(self):
+		doc1 = self.conn.insert(dict(doctype='Note', title='apple', content=TXT))
+		doc2 = self.conn.insert(dict(doctype='Note', title='banana', content=TXT))
+		doc3 = self.conn.insert(dict(doctype='Note', title='carrot', content=TXT))
+
+		notes = self.conn.get_list('Note', fields=['content', 'name'], filters=dict(title=['like', 'ap%']))
+		self.assertEqual(len(notes), 1)
+		self.assertEqual(notes[0].get('name'), doc1.get('name'))
+
+		self.conn.delete(doctype='Note', name=doc1.get('name'))
+		self.conn.delete(doctype='Note', name=doc2.get('name'))
+		self.conn.delete(doctype='Note', name=doc3.get('name'))
 
 
-class FrappeClientTest(unittest.TestCase):
-
-    @httpretty.activate
-    def setUp(self):
-        httpretty.register_uri(httpretty.POST,
-                               "http://example.com",
-                               body='{"message":"Logged In"}',
-                               content_type="application/json"
-                               )
-        self.frappe = FrappeClient("http://example.com",
-                                   "user@example.com",
-                                   "password")
-
-    @httpretty.activate
-    def test_get_doc_with_no_doc_name(self):
-        httpretty.register_uri(
-            httpretty.GET,
-            "http://example.com/api/resource/SomeDoc/",
-            body='{"data": { "f1": "v1","f2": "v2"}}',
-            content_type="application/json"
-        )
-        res = self.frappe.get_doc(
-            "SomeDoc",
-            filters=[["Note", "title", "LIKE", "S%"]],
-            fields=["name", "foo"])
-
-        self.assertEquals(res, {'f1': 'v1', 'f2': 'v2'})
-
-        request = httpretty.last_request()
-        url = urlparse.urlparse(request.path)
-        query_dict = urlparse.parse_qs(url.query)
-        self.assertEquals(query_dict['fields'],
-                          [u'["name", "foo"]'])
-        self.assertEquals(query_dict['filters'],
-                          [u'[["Note", "title", "LIKE", "S%"]]'])
+if __name__=='__main__':
+	unittest.main()
