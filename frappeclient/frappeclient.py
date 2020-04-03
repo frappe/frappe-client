@@ -4,7 +4,7 @@ import json
 try:
 	from StringIO import StringIO
 except:
-	from IO import StringIO
+	from io import StringIO
 
 try:
     unicode
