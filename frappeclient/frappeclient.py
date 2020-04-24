@@ -81,8 +81,6 @@ class FrappeClient(object):
 		res = self.session.post(self.url + "/api/resource/" + quote(doc.get("doctype")),
 			data={"data":json.dumps(doc)})
 		return self.post_process(res)
-		# print("RES:",res)
-		# return res
 
 	def insert_many(self, docs):
 		'''Insert multiple documents to the remote server
@@ -98,11 +96,8 @@ class FrappeClient(object):
 
 		:param doc: dict or Document object to be updated remotely. `name` is mandatory for this'''
 		url = self.url + "/api/resource/" + quote(doc.get("doctype")) + "/" + quote(doc.get("name"))
-		print("URL:",url)
-		print("Doc:",json.dumps(doc))
 		res = self.session.put(url, data={"data":json.dumps(doc)})
 		return self.post_process(res)
-		# return res
 
 	def bulk_update(self, docs):
 		'''Bulk update documents remotely
