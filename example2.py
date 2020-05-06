@@ -93,7 +93,7 @@ def get_path(*args):
 def download():
 	c = Client('http://localhost:8000', 'Administrator', 'admin')
 
-	for k,v in files.items():
+	for k,v in list(files.items()):
 		for dt in v:
 			for s, ext, method in (('Schemes', 'pdf', 'get_pdf'), ('Upload Templates', 'csv', 'get_upload_template')):
 				base_path = get_path(k, s)
@@ -104,12 +104,12 @@ def download():
 					else:
 						try:
 							content = fn(dt)
-						except Exception, e:
-							print 'Failed to Download: ' + dt
+						except Exception as e:
+							print(('Failed to Download: ' + dt))
 							continue
 
 					handler.write(content.getvalue())
-				print 'Downloaded: `{0}` of {1}'.format(ext, dt)
+				print(('Downloaded: `{0}` of {1}'.format(ext, dt)))
 
 if __name__ == '__main__':
 	download()
