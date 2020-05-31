@@ -22,7 +22,7 @@ def sync():
 			if row[0]=="Timestamp":
 				continue
 
-			print(("finding " + row[EMAIL]))
+			print("finding " + row[EMAIL])
 			name = client.get_value("Job Applicant", "name", {"email_id": row[EMAIL]})
 
 			if name:
@@ -42,10 +42,10 @@ def sync():
 
 			if name:
 				client.update(doc)
-				print(("Updated " + row[EMAIL]))
+				print("Updated " + row[EMAIL])
 			else:
 				client.insert(doc)
-				print(("Inserted " + row[EMAIL]))
+				print("Inserted " + row[EMAIL])
 
 if __name__=="__main__":
 	sync()

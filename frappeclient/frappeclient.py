@@ -1,7 +1,10 @@
 import requests
 import json
-from urllib.parse import quote
 
+try:
+	from urllib.parse import quote
+except:
+	from urllib import pathname2url as quote
 try:
 	from StringIO import StringIO
 except:

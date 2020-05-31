@@ -105,11 +105,11 @@ def download():
 						try:
 							content = fn(dt)
 						except Exception as e:
-							print(('Failed to Download: ' + dt))
+							print('Failed to Download: ' + dt)
 							continue
 
 					handler.write(content.getvalue())
-				print(('Downloaded: `{0}` of {1}'.format(ext, dt)))
+				print('Downloaded: `{0}` of {1}'.format(ext, dt))
 
 if __name__ == '__main__':
 	download()
