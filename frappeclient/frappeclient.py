@@ -4,7 +4,7 @@ import json
 try:
 	from StringIO import StringIO
 except:
-	from IO import StringIO
+	from io import StringIO
 
 try:
     unicode
@@ -298,7 +298,7 @@ class FrappeClient(object):
 			try:
 				rjson = response.json()
 			except ValueError:
-				print response.text
+				print (response.text)
 				raise
 
 			if rjson and ('exc' in rjson) and rjson['exc']:
