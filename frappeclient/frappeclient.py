@@ -1,10 +1,12 @@
 import requests
 import json
 
+from urllib.parse import quote
+
 try:
 	from StringIO import StringIO
 except:
-	from IO import StringIO
+	from io import StringIO
 
 try:
     unicode
@@ -91,7 +93,7 @@ class FrappeClient(object):
 		'''Insert a document to the remote server
 
 		:param doc: A dict or Document object to be inserted remotely'''
-		res = self.session.post(self.url + "/api/resource/" + doc.get("doctype"),
+		res = self.session.post(self.url + "/api/resource/" + quote(doc.get("doctype")),
 			data={"data":json.dumps(doc)})
 		return self.post_process(res)
 
@@ -108,7 +110,7 @@ class FrappeClient(object):
 		'''Update a remote document
 
 		:param doc: dict or Document object to be updated remotely. `name` is mandatory for this'''
-		url = self.url + "/api/resource/" + doc.get("doctype") + "/" + doc.get("name")
+		url = self.url + "/api/resource/" + quote(doc.get("doctype")) + "/" + quote(doc.get("name"))
 		res = self.session.put(url, data={"data":json.dumps(doc)})
 		return self.post_process(res)
 
@@ -298,7 +300,7 @@ class FrappeClient(object):
 			try:
 				rjson = response.json()
 			except ValueError:
-				print response.text
+				print(response.text)
 				raise
 
 			if rjson and ('exc' in rjson) and rjson['exc']:
