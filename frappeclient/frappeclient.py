@@ -247,11 +247,11 @@ class FrappeClient(object):
 		return self.post_process_file_stream(request)
 
 	def get_api(self, method, params={}):
-		res = self.session.get(self.url + '/api/method/' + method + '/', params=params)
+		res = self.session.get(self.url + '/api/method/' + method, params=params)
 		return self.post_process(res)
 
 	def post_api(self, method, params={}):
-		res = self.session.post(self.url + '/api/method/' + method + '/', params=params)
+		res = self.session.post(self.url + '/api/method/' + method, params=params)
 		return self.post_process(res)
 
 	def get_request(self, params):
