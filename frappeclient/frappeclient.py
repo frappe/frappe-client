@@ -61,8 +61,7 @@ class FrappeClient(object):
 			raise AuthError
 
 	def authenticate(self, api_key, api_secret):
-		token = b64encode('{}:{}'.format(api_key, api_secret))
-		auth_header = {'Authorization': 'Basic {}'.format(token)}
+		auth_header = {'Authorization': 'token {}:{}'.format(api_key, api_secret)}
 		self.session.headers.update(auth_header)
 
 	def logout(self):
