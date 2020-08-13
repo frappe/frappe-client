@@ -27,12 +27,16 @@ class NotUploadableException(FrappeException):
 		self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(doctype)
 
 
-class DocumentNotFound(FrappeException):
+class DocumentNotFoundException(FrappeException):
 	def __init__(self, doctype="", name=""):
 		if doctype and name:
 			self.message = "Document `{0}` of doctype `{1}` not found.".format(name, doctype)
 		else:
 			self.message = "Document not found."
+
+
+class DocumentConflictException(FrappeException):
+	pass
 
 
 class FrappeClient(object):
@@ -289,12 +293,16 @@ class FrappeClient(object):
 	def post_process(self, response):
 		if response.status_code == 401:
 			raise AuthError
-		if response.status_code == 404:
+		elif response.status_code == 404:
 			if response.request.path_url.startswith("/api/resource/"):
 				path = response.request.path_url.split("/")
-				raise DocumentNotFound(path[3], path[4])
+				raise DocumentNotFoundException(path[3], path[4])
 			else:
-				raise DocumentNotFound
+				raise DocumentNotFoundException
+		elif response.status_code == 409:
+			raise DocumentConflictException
+		elif response.status_code != 200:
+			raise FrappeException("Unhandled Frappe exception.")
 
 		try:
 			rjson = response.json()
