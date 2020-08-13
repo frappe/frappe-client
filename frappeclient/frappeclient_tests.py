@@ -38,7 +38,7 @@ class TestFrappeClient(unittest.TestCase):
 	def test_token_auth(self):
 		self.conn.authenticate('test_key', 'test_secret')
 		auth_header = self.conn.session.headers.get('Authorization')
-		self.assertEquals(auth_header, 'Basic dGVzdF9rZXk6dGVzdF9zZWNyZXQ=')
+		self.assertEquals(auth_header, 'token test_key:test_secret')
 
 
 if __name__=='__main__':
