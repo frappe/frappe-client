@@ -275,6 +275,9 @@ class FrappeClient(object):
 		return params
 
 	def post_process(self, response):
+		if response.status_code == 401:
+			raise AuthError
+
 		try:
 			rjson = response.json()
 		except ValueError:
