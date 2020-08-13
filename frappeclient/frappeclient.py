@@ -61,10 +61,14 @@ class FrappeClient(object):
 		else:
 			raise AuthError
 
-	def authenticate(self, api_key, api_secret):
+	def authenticate(self, api_key, api_secret, test_success=False):
 		token = b64encode('{}:{}'.format(api_key, api_secret))
 		auth_header = {'Authorization': 'Basic {}'.format(token)}
 		self.session.headers.update(auth_header)
+
+		if test_success:
+			# If the authorization isn't successful AuthError is raised in post_process
+			self.get_api("frappe.auth.get_logged_user")
 
 	def logout(self):
 		self.session.get(self.url, params={
