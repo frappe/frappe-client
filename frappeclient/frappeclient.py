@@ -28,12 +28,13 @@ class NotUploadableException(FrappeException):
 
 
 class FrappeClient(object):
-	def __init__(self, url=None, username=None, password=None, api_key=None, api_secret=None, verify=True):
+	def __init__(self, url=None, username=None, password=None, api_key=None, api_secret=None, verify=True, print_on_error=True):
 		self.headers = dict(Accept='application/json')
 		self.session = requests.Session()
 		self.can_download = []
 		self.verify = verify
 		self.url = url
+		self.print_on_error = print_on_error
 
 		if username and password:
 			self.login(username, password)
@@ -277,7 +278,8 @@ class FrappeClient(object):
 		try:
 			rjson = response.json()
 		except ValueError:
-			print(response.text)
+			if self.print_on_error:
+				print(response.text)
 			raise
 
 		if rjson and ('exc' in rjson) and rjson['exc']:
@@ -300,7 +302,8 @@ class FrappeClient(object):
 			try:
 				rjson = response.json()
 			except ValueError:
-				print(response.text)
+				if self.print_on_error:
+					print(response.text)
 				raise
 
 			if rjson and ('exc' in rjson) and rjson['exc']:
