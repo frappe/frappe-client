@@ -1,5 +1,6 @@
 import requests
 import json
+import re
 
 from urllib.parse import quote
 
@@ -9,9 +10,9 @@ except:
 	from io import StringIO
 
 try:
-    unicode
+	unicode
 except NameError:
-    unicode = str
+	unicode = str
 
 
 class AuthError(Exception):
@@ -25,7 +26,6 @@ class FrappeException(Exception):
 class NotUploadableException(FrappeException):
 	def __init__(self, doctype):
 		self.message = "The doctype `{1}` is not uploadable, so you can't download the template".format(doctype)
-
 
 class FrappeClient(object):
 	def __init__(self, url=None, username=None, password=None, api_key=None, api_secret=None, verify=True):
@@ -53,7 +53,6 @@ class FrappeClient(object):
 			'usr': username,
 			'pwd': password
 		}, verify=self.verify, headers=self.headers)
-
 		if r.json().get('message') == "Logged In":
 			self.can_download = []
 			return r.json()
@@ -105,6 +104,20 @@ class FrappeClient(object):
 			"cmd": "frappe.client.insert_many",
 			"docs": frappe.as_json(docs)
 		})
+
+	def upsert(self, doc):
+		'''Insert a remote document, if doc is already existing, update the doc
+
+		:param doc: dict or Document object to be updated remotely. `name` is mandatory for this'''
+		try:
+			self.insert(doc)
+		except Exception as e:
+			if doc.get('name') is None:
+				raise FrappeException("DocNameNotDefined")
+			if e.args[0].find('frappe.exceptions.DuplicateEntryError')>=0:
+				self.update(doc)
+			else:
+				raise FrappeException(*e.args)
 
 	def update(self, doc):
 		'''Update a remote document
@@ -181,7 +194,7 @@ class FrappeClient(object):
 			params["fields"] = json.dumps(fields)
 
 		res = self.session.get(self.url + '/api/resource/' + doctype + '/' + name,
-							   params=params)
+	params=params)
 
 		return self.post_process(res)
 
@@ -270,15 +283,20 @@ class FrappeClient(object):
 		for key, value in params.iteritems():
 			if isinstance(value, (dict, list)):
 				params[key] = json.dumps(value)
-
 		return params
 
 	def post_process(self, response):
 		try:
 			rjson = response.json()
 		except ValueError:
-			print(response.text)
-			raise
+			m0 = re.findall(r"(frappe\.exceptions\..*?\))", response.text)
+			if len(m0) > 0:
+				raise FrappeException(m0[0])
+			m1 = re.findall(r"(pymysql\.err\..*?\))", response.text)
+			if len(m1) > 0:
+				raise FrappeException(m1[0])
+			
+			raise FrappeException("FrappeException")
 
 		if rjson and ('exc' in rjson) and rjson['exc']:
 			raise FrappeException(rjson['exc'])
