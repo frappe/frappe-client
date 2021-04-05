@@ -1,5 +1,6 @@
 import requests
 import json
+from base64 import b64encode
 
 from urllib.parse import quote
 
@@ -61,7 +62,7 @@ class FrappeClient(object):
 			raise AuthError
 
 	def authenticate(self, api_key, api_secret):
-		token = b64encode('{}:{}'.format(api_key, api_secret))
+		token = b64encode('{}:{}'.format(api_key, api_secret).encode()).decode()
 		auth_header = {'Authorization': 'Basic {}'.format(token)}
 		self.session.headers.update(auth_header)
 
@@ -267,7 +268,7 @@ class FrappeClient(object):
 
 	def preprocess(self, params):
 		'''convert dicts, lists to json'''
-		for key, value in params.iteritems():
+		for key, value in params.items():
 			if isinstance(value, (dict, list)):
 				params[key] = json.dumps(value)
 
