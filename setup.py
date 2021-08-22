@@ -8,8 +8,8 @@ with open('requirements.txt') as requirements:
 setup(
     name='frappeclient',
     version=version,
-    author='Rushabh Mehta',
-    author_email='rushabh@erpnext.com',
+    author='Team RCN',
+    author_email='teamrcn@gmx.com',
     packages=[
         'frappeclient'
     ],
