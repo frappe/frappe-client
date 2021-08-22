@@ -1,12 +1,12 @@
 from setuptools import setup
 
-version = '0.1.0dev'
+version = '1.1.0dev'
 
 with open('requirements.txt') as requirements:
     install_requires = requirements.read().split()
 
 setup(
-    name='frappeclient',
+    name='pyfrappeclient',
     version=version,
     author='Team RCN',
     author_email='teamrcn@gmx.com',
