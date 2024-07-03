@@ -29,8 +29,8 @@ conn.login("user@example.com", "password")
 ```py
 from frappeclient import FrappeClient
 
-client = FrappeClient("https://example.com")
-client.authenticate("my_api_key", "my_api_secret")
+conn = FrappeClient("https://example.com")
+conn.authenticate("my_api_key", "my_api_secret")
 ```
 
 For demonstration purposes only! Never store any credentials in your source code. Instead, you could set them as environment variables and fetch them with `os.getenv()`.
