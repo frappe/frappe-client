@@ -152,6 +152,15 @@ class FrappeClient(object):
 			'filters': json.dumps(filters)
 		})
 
+	def exists(self, doctype, name):
+		resp = self.get_request({
+			"cmd": "frappe.client.get_value",
+			"doctype": doctype,
+			"fieldname": "name",
+			"filters": json.dumps({"name": name}),
+		})
+		return resp and resp["name"] == name
+
 	def set_value(self, doctype, docname, fieldname, value):
 		return self.post_request({
 			'cmd': 'frappe.client.set_value',
