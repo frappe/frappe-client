@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from frappeclient import FrappeClient
+from ctgfrappeclient import FrappeClient
 
 test_config = dict(
 	url = 'http://frappe.local:8000',

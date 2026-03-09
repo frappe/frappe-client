@@ -2,7 +2,7 @@
 # Import job applications from a CSV File (created via Google Forms) to "Job Application"
 
 import csv
-from frappeclient import FrappeClient
+from ctgfrappeclient import FrappeClient
 
 NAME = 2
 EMAIL = 3

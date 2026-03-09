@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from frappeclient import FrappeClient as Client
+from ctgfrappeclient import FrappeClient as Client
 import os
 
 files = {

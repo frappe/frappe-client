@@ -104,7 +104,7 @@ class FrappeClient(object):
 		:param docs: List of dict or Document objects to be inserted in one request'''
 		return self.post_request({
 			"cmd": "frappe.client.insert_many",
-			"docs": frappe.as_json(docs)
+			"docs": json.dumps(docs)
 		})
 
 	def update(self, doc):

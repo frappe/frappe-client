@@ -1,17 +1,17 @@
 from setuptools import setup
 
-version = '0.1.0dev'
+version = '0.1.2'
 
 with open('requirements.txt') as requirements:
     install_requires = requirements.read().split()
 
 setup(
-    name='frappeclient',
+    name='ctg-frappeclient',
     version=version,
-    author='Rushabh Mehta',
-    author_email='rushabh@erpnext.com',
+    author='ctgalega',
+    author_email='soporte@ctgalega.com',
     packages=[
-        'frappeclient'
+        'ctgfrappeclient'
     ],
     install_requires=install_requires,
     tests_requires=[
